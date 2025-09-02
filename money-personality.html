@@ -2,243 +2,263 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Money Personality Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      margin: 20px;
+      background: #f9f9f9;
+      color: #333;
     }
+
     .quiz-container {
+      max-width: 700px;
+      margin: auto;
       background: white;
       padding: 20px;
-      border-radius: 12px;
-      width: 500px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
     }
+
     .question {
       font-size: 18px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
     .options label {
-      display: block;
-      margin: 8px 0;
+      flex: 1;
+      text-align: center;
+      margin: 0 5px;
+      padding: 10px;
+      border-radius: 6px;
       cursor: pointer;
+      color: white;
+      font-size: 14px;
+      transition: transform 0.2s ease;
     }
-    .btn {
-      background: #4CAF50;
+
+    .options input {
+      display: none;
+    }
+
+    /* Different colors for each option */
+    .strongly-disagree { background: #d9534f; } /* red */
+    .disagree { background: #f0ad4e; } /* orange */
+    .neutral { background: #5bc0de; } /* blue */
+    .agree { background: #5cb85c; } /* green */
+    .strongly-agree { background: #4a148c; } /* purple */
+
+    .options input:checked + label {
+      border: 2px solid black;
+      transform: scale(1.1);
+    }
+
+    .progress-bar {
+      height: 20px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress {
+      height: 100%;
+      background: #4caf50;
+      width: 0;
+      transition: width 0.3s;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f1f1f1;
+      border-radius: 8px;
+    }
+
+    button {
+      background: #4caf50;
       color: white;
       border: none;
       padding: 10px 15px;
-      margin-top: 15px;
+      border-radius: 6px;
       cursor: pointer;
-      border-radius: 8px;
+      font-size: 16px;
     }
-    .btn:hover {
+
+    button:hover {
       background: #45a049;
-    }
-    .progress {
-      height: 8px;
-      background: #ddd;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 8px;
-      background: #4CAF50;
-      width: 0;
-      transition: width 0.3s;
     }
   </style>
 </head>
 <body>
   <div class="quiz-container">
-    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <h2>Money Personality Quiz</h2>
+    <div class="progress-bar"><div class="progress"></div></div>
     <div id="quiz"></div>
+    <button id="nextBtn">Next</button>
+    <div id="result" class="result" style="display:none;"></div>
+    <button id="downloadBtn" style="display:none;">Download CSV</button>
   </div>
 
-<script>
-const questions = [
-  "Q1: I feel more secure when I have savings set aside.",
-  "Q2: I enjoy putting money into investments for long-term growth.",
-  "Q3: I think money is not very important in life.",
-  "Q4: I enjoy giving money to help others in need.",
-  "Q5: I often buy things on impulse.",
-  "Q6: I avoid looking at my bank account or bills.",
-  "Q7: I enjoy taking risks with my money for higher rewards.",
-  "Q8: I believe money is a necessary evil rather than a good thing.",
-  "Q9: I feel happy when I can support friends or family financially.",
-  "Q10: I prefer saving over spending.",
-  "Q11: I procrastinate paying bills or handling money matters.",
-  "Q12: I regularly research investments before committing.",
-  "Q13: Shopping gives me excitement and joy.",
-  "Q14: I often upgrade to the latest gadgets or fashion.",
-  "Q15: I feel anxious when I have to deal with money issues.",
-  "Q16: I see money as a tool to try new ventures.",
-  "Q17: I think money should be used only for necessities, not luxury.",
-  "Q18: I set financial goals and track progress regularly.",
-  "Q19: I like the thrill of high-stakes financial opportunities.",
-  "Q20: Money can corrupt relationships and values.",
-  "Q21: I am strict about budgeting every expense.",
-  "Q22: I sometimes avoid financial decisions altogether.",
-  "Q23: I frequently donate to charities or community causes.",
-  "Q24: I feel uneasy if my savings account is low.",
-  "Q25: I put others' needs above my own financial needs.",
-  "Q26: I diversify my investments.",
-  "Q27: I’m comfortable gambling or speculating with money.",
-  "Q28: I believe money distracts from spiritual or personal growth.",
-  "Q29: I find satisfaction in giving gifts to loved ones.",
-  "Q30: I focus on building wealth systematically.",
-  "Q31: I neglect keeping track of my daily expenses.",
-  "Q32: I always think twice before making a purchase.",
-  "Q33: I like to spend money on experiences rather than savings.",
-  "Q34: I feel energized when making bold financial choices.",
-  "Q35: I often spend more than I planned when shopping.",
-  "Q36: I believe my money habits define who I am."
-];
+  <script>
+    const questions = [
+      "I decide how much of my income to save each month based on specific goals or priorities.",
+      "I evaluate investment opportunities by considering key factors like risk and potential return.",
+      "My beliefs and values shape how I view money and financial decisions.",
+      "I determine how much I give to others without compromising my own financial stability.",
+      "My spending decisions are motivated by comfort, joy, or necessity.",
+      "I find certain aspects of financial management, like budgeting or bill payments, overwhelming or stressful.",
+      "I am attracted to high-risk, high-reward financial opportunities.",
+      "I find it challenging to make financial decisions that conflict with my spiritual or personal values.",
+      "I have felt financially strained because of my generosity but have learned to manage the situation.",
+      "Most of my purchases are spontaneous rather than planned in advance.",
+      "I rarely review my budget or track my spending habits.",
+      "I balance my portfolio by combining high-risk and low-risk investments.",
+      "I have faced financial challenges due to overspending but have learned how to handle them.",
+      "I incorporate saving into my lifestyle in ways that feel manageable and not restrictive.",
+      "I rely on specific methods to ensure that important financial responsibilities are met.",
+      "I have experienced significant financial losses from taking risks and learned valuable lessons.",
+      "I avoid discussing money matters with others because it feels uncomfortable.",
+      "I aim to enjoy my wealth while planning for long-term growth.",
+      "I carefully evaluate whether a financial risk is worth taking.",
+      "I embrace money as a tool for good while staying true to my values.",
+      "I often feel anxious about spending money, even on necessary or enjoyable items.",
+      "Ignoring finances has negatively impacted my long-term financial goals.",
+      "My giving habits are driven by strong emotions or values.",
+      "I have clear long-term financial goals and take steps to ensure I am on track to achieve them.",
+      "I set boundaries and budgets for giving to balance generosity with financial stability.",
+      "I have learned valuable lessons from both successful and unsuccessful investments.",
+      "I create a safety net to protect against losses when risks don’t pay off.",
+      "I balance financial growth with a focus on purpose and community.",
+      "I understand how setting limits on giving allows me to continue helping others while securing my own needs.",
+      "I ensure my financial decisions align with my personal values and goals.",
+      "I am taking small, manageable steps to improve my financial habits.",
+      "I try to balance saving for the future while allowing myself to enjoy the present.",
+      "I balance enjoying life now with planning for my financial future.",
+      "I incorporate safer financial practices while maintaining my adventurous spirit.",
+      "I rarely treat myself or splurge on something I want, and when I do, it feels uncomfortable."
+    ];
 
-// Personality mapping
-const mapping = {
-  "Saver": [1,10,21,24,32],
-  "Spender": [5,13,14,33,35],
-  "Avoider": [6,11,15,22,31],
-  "Giver": [4,9,23,25,29],
-  "Investor": [2,12,18,26,30],
-  "Risk-Taker": [7,16,19,27,34],
-  "Money Monk": [3,8,17,20,28]
-};
+    const personalityMap = {
+      "Saver": [1, 21, 24, 32, 35],
+      "Spender": [5, 10, 13, 14, 33],
+      "Avoider": [6, 11, 15, 22, 31],
+      "Giver": [4, 9, 23, 25, 29],
+      "Investor": [2, 12, 18, 26, 30],
+      "Risk-Taker": [7, 16, 19, 27, 34],
+      "Money Monk": [3, 8, 17, 20, 28]
+    };
 
-// Personality details
-const personalities = {
-  "Saver": {
-    description: "Budget-focused and disciplined. Prefers to save for emergencies and long-term goals.",
-    characteristics: "Disciplined, cautious, budget-oriented, values security.",
-    strengths: "Well-prepared for the future, avoids debt, financial stability.",
-    blindspots: "Can be overly frugal, miss out on life experiences, anxious about spending."
-  },
-  "Spender": {
-    description: "Loves immediate gratification and enjoys life in the moment.",
-    characteristics: "Impulsive, enjoys comfort, loves shopping and experiences.",
-    strengths: "Knows how to enjoy money, creates memorable experiences, fun-loving.",
-    blindspots: "Risk of debt, poor long-term planning, unprepared for emergencies."
-  },
-  "Avoider": {
-    description: "Prefers to ignore financial matters and avoids money decisions.",
-    characteristics: "Procrastinates with bills, avoids bank statements, disorganized.",
-    strengths: "Less stressed about financial details, easy-going about money.",
-    blindspots: "Financial neglect, missed opportunities, late payments, instability."
-  },
-  "Giver": {
-    description: "Finds joy in helping others financially.",
-    characteristics: "Generous, supportive, selfless, community-driven.",
-    strengths: "Builds strong relationships, makes a difference in others’ lives.",
-    blindspots: "Neglects own needs, risks financial insecurity, may be taken advantage of."
-  },
-  "Investor": {
-    description: "Focused on building wealth through smart decisions.",
-    characteristics: "Analytical, strategic, future-focused, disciplined with goals.",
-    strengths: "Wealth-building mindset, goal-oriented, understands financial growth.",
-    blindspots: "Can be overly focused on money, risk of neglecting enjoyment of life."
-  },
-  "Risk-Taker": {
-    description: "Enjoys bold financial choices and high rewards.",
-    characteristics: "Adventurous, thrill-seeker, confident with uncertainty.",
-    strengths: "Can achieve big wins, embraces opportunities, innovative thinker.",
-    blindspots: "High risk of loss, impulsive decisions, potential financial instability."
-  },
-  "Money Monk": {
-    description: "Sees money as less important compared to values and relationships.",
-    characteristics: "Values simplicity, avoids materialism, spiritual outlook.",
-    strengths: "Contentment, less driven by greed, focuses on meaning.",
-    blindspots: "May ignore financial planning, risk poverty, undervalue money’s role."
-  }
-};
+    const descriptions = {
+      "Saver": {
+        characteristics: "Budget-focused and disciplined. Prefers to save for emergencies and long-term goals. Avoids unnecessary expenses and enjoys financial security.",
+        blindspots: "Excessive frugality can lead to missed opportunities for enjoyment or experiences. May develop anxiety about spending."
+      },
+      "Spender": {
+        characteristics: "Loves immediate gratification through purchases. Focuses on enjoying life in the present moment. May prioritize comfort and experiences over saving.",
+        blindspots: "Lack of planning can lead to debt or instability. May be unprepared for emergencies."
+      },
+      "Avoider": {
+        characteristics: "Avoids thinking about or managing finances. Procrastinates on budgeting. Often overwhelmed by financial decisions.",
+        blindspots: "Ignoring finances can cause long-term issues like debt or instability. May feel unprepared when facing decisions."
+      },
+      "Giver": {
+        characteristics: "Finds fulfillment in helping others. Often feels responsible for family/community. Prioritizes generosity over personal stability.",
+        blindspots: "Over-giving may harm their financial security. Struggles with boundaries, leading to strain."
+      },
+      "Investor": {
+        characteristics: "Focuses on growing wealth through strategic investments. Seeks opportunities in business, real estate, or stocks.",
+        blindspots: "Hyper-focus on growth can neglect present joys or relationships. May become overly cautious."
+      },
+      "Risk-Taker": {
+        characteristics: "Enjoys high-risk, high-reward ventures. Thrives on bold, entrepreneurial pursuits.",
+        blindspots: "Excessive risk-taking may cause losses and instability. Might overlook diversification."
+      },
+      "Money Monk": {
+        characteristics: "Views money with suspicion. Values purpose and simplicity over wealth. Avoids discussing finances.",
+        blindspots: "Avoidance may cause instability or missed opportunities. Reluctance to use money as a tool for good."
+      }
+    };
 
-let currentQuestion = 0;
-let answers = [];
+    let currentQuestion = 0;
+    let answers = [];
 
-function showQuestion() {
-  const quiz = document.getElementById("quiz");
-  if (currentQuestion < questions.length) {
-    document.getElementById("progress-bar").style.width = 
-      ((currentQuestion) / questions.length) * 100 + "%";
+    function showQuestion() {
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = `
+        <div class="question">${questions[currentQuestion]}</div>
+        <div class="options">
+          <input type="radio" id="opt1" name="q" value="1">
+          <label for="opt1" class="strongly-disagree">Strongly Disagree</label>
+          <input type="radio" id="opt2" name="q" value="2">
+          <label for="opt2" class="disagree">Disagree</label>
+          <input type="radio" id="opt3" name="q" value="3">
+          <label for="opt3" class="neutral">Neutral</label>
+          <input type="radio" id="opt4" name="q" value="4">
+          <label for="opt4" class="agree">Agree</label>
+          <input type="radio" id="opt5" name="q" value="5">
+          <label for="opt5" class="strongly-agree">Strongly Agree</label>
+        </div>
+      `;
 
-    quiz.innerHTML = `
-      <div class="question">${questions[currentQuestion]}</div>
-      <div class="options">
-        <label><input type="radio" name="q${currentQuestion}" value="1"> Strongly Disagree</label>
-        <label><input type="radio" name="q${currentQuestion}" value="2"> Disagree</label>
-        <label><input type="radio" name="q${currentQuestion}" value="3"> Neutral</label>
-        <label><input type="radio" name="q${currentQuestion}" value="4"> Agree</label>
-        <label><input type="radio" name="q${currentQuestion}" value="5"> Strongly Agree</label>
-      </div>
-      <button class="btn" onclick="nextQuestion()">Next</button>
-    `;
-  } else {
-    calculateResult();
-  }
-}
+      document.querySelector(".progress").style.width = ((currentQuestion) / questions.length) * 100 + "%";
+    }
 
-function nextQuestion() {
-  const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
-  if (!selected) {
-    alert("Please select an option!");
-    return;
-  }
-  answers[currentQuestion] = parseInt(selected.value);
-  currentQuestion++;
-  showQuestion();
-}
-
-function calculateResult() {
-  let scores = {};
-  for (let type in mapping) {
-    scores[type] = 0;
-    mapping[type].forEach(q => {
-      scores[type] += answers[q-1] || 0;
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      const selected = document.querySelector("input[name='q']:checked");
+      if (!selected) { alert("Please select an option!"); return; }
+      answers.push(parseInt(selected.value));
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        calculateResult();
+      }
     });
-  }
 
-  let result = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+    function calculateResult() {
+      let scores = {};
+      for (let p in personalityMap) scores[p] = 0;
 
-  const quiz = document.getElementById("quiz");
-  document.getElementById("progress-bar").style.width = "100%";
+      for (let p in personalityMap) {
+        personalityMap[p].forEach(q => {
+          scores[p] += answers[q - 1] || 0;
+        });
+      }
 
-  const personality = personalities[result];
+      const best = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
 
-  quiz.innerHTML = `
-    <h2>Your Money Personality: ${result}</h2>
-    <p><b>Description:</b> ${personality.description}</p>
-    <p><b>Characteristics:</b> ${personality.characteristics}</p>
-    <p><b>Strengths:</b> ${personality.strengths}</p>
-    <p><b>Blindspots:</b> ${personality.blindspots}</p>
-    <button class="btn" onclick="downloadCSV('${result}')">Download Results as CSV</button>
-  `;
-}
+      document.getElementById("result").style.display = "block";
+      document.getElementById("result").innerHTML = `
+        <h3>Your Money Personality: ${best}</h3>
+        <p><b>Characteristics:</b> ${descriptions[best].characteristics}</p>
+        <p><b>Blind Spots:</b> ${descriptions[best].blindspots}</p>
+      `;
 
-function downloadCSV(result) {
-  const personality = personalities[result];
-  if (!personality) return;
+      document.getElementById("downloadBtn").style.display = "block";
+      document.getElementById("downloadBtn").onclick = () => downloadCSV(best, descriptions[best]);
+    }
 
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Personality,Description,Characteristics,Strengths,Blindspots\n";
-  csvContent += `"${result}","${personality.description}","${personality.characteristics}","${personality.strengths}","${personality.blindspots}"\n`;
+    function downloadCSV(type, desc) {
+      let csvContent = "data:text/csv;charset=utf-8,Personality,Characteristics,Blindspots\n";
+      csvContent += `"${type}","${desc.characteristics}","${desc.blindspots}"\n`;
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", "money_personality.csv");
+      document.body.appendChild(link);
+      link.click();
+    }
 
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `${result}_personality_result.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-showQuestion();
-</script>
+    showQuestion();
+  </script>
 </body>
 </html>
