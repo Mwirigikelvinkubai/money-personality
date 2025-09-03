@@ -5,20 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Money Personality Quiz</title>
   <style>
+    /* Page background */
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
+      margin: 0;                 /* allow the background to fully cover */
+      min-height: 100vh;
+      padding: 20px;             /* replaces old margin */
       color: #333;
+
+      /* Background image + dark overlay (for readability) */
+      background:
+        linear-gradient(to bottom right, rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url('bg.jpg') center / cover no-repeat fixed;
+      /* ^ Put your image file in the same folder, or change the path */
     }
 
     .quiz-container {
       max-width: 700px;
       margin: auto;
-      background: white;
+      background: rgba(255, 255, 255, 0.92); /* translucent “card” over image */
+      backdrop-filter: blur(4px);             /* subtle glass effect (supported in modern browsers) */
+      -webkit-backdrop-filter: blur(4px);
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.5);
     }
 
     .question {
@@ -30,18 +41,21 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 20px;
+      gap: 8px;
     }
 
     .options label {
       flex: 1;
       text-align: center;
-      margin: 0 5px;
+      margin: 0;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       color: white;
       font-size: 14px;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      border: 2px solid transparent;
     }
 
     .options input {
@@ -50,27 +64,29 @@
 
     /* Different colors for each option */
     .strongly-disagree { background: #d9534f; } /* red */
-    .disagree { background: #f0ad4e; } /* orange */
-    .neutral { background: #5bc0de; } /* blue */
-    .agree { background: #5cb85c; } /* green */
-    .strongly-agree { background: #4a148c; } /* purple */
+    .disagree          { background: #f0ad4e; } /* orange */
+    .neutral           { background: #5bc0de; } /* blue */
+    .agree             { background: #5cb85c; } /* green */
+    .strongly-agree    { background: #4a148c; } /* purple */
 
     .options input:checked + label {
-      border: 2px solid black;
-      transform: scale(1.1);
+      border-color: rgba(0,0,0,0.5);
+      transform: scale(1.055);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.18);
     }
 
     .progress-bar {
       height: 20px;
-      background: #e0e0e0;
-      border-radius: 10px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 999px;
       overflow: hidden;
       margin-bottom: 20px;
+      border: 1px solid rgba(0,0,0,0.08);
     }
 
     .progress {
       height: 100%;
-      background: #4caf50;
+      background: linear-gradient(90deg, #4caf50, #45b36b);
       width: 0;
       transition: width 0.3s;
     }
@@ -78,8 +94,9 @@
     .result {
       margin-top: 20px;
       padding: 15px;
-      background: #f1f1f1;
-      border-radius: 8px;
+      background: #f7f9f7;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
     button {
@@ -87,13 +104,21 @@
       color: white;
       border: none;
       padding: 10px 15px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
 
     button:hover {
       background: #45a049;
+    }
+
+    /* Responsive: stack options on narrow screens */
+    @media (max-width: 520px) {
+      .options {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -246,11 +271,12 @@
 
       document.getElementById("downloadBtn").style.display = "block";
       document.getElementById("downloadBtn").onclick = () => downloadCSV(best, descriptions[best]);
+      document.querySelector(".progress").style.width = "100%";
     }
 
     function downloadCSV(type, desc) {
       let csvContent = "data:text/csv;charset=utf-8,Personality,Characteristics,Blindspots\n";
-      csvContent += `"${type}","${desc.characteristics}","${desc.blindspots}"\n`;
+      csvContent += `"${type}","${desc.characteristics.replace(/"/g,'""')}","${desc.blindspots.replace(/"/g,'""')}"\n`;
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
       link.setAttribute("download", "money_personality.csv");
